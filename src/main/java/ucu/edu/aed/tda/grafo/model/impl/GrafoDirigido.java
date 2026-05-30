@@ -45,6 +45,16 @@ public class GrafoDirigido implements IDirectedGraphAlgorithms {
         return List.of();
     }
 
+    /**
+     * Recorrido en profundidad de un grafo dirigido, utilizando un hashset para controlar los vértices visitados y corroborar en O(1)
+     * y evitar ciclos infinitos.
+     * @param grafo Grafo dirigido que se va a recorrer en profundidad
+     * @param sourceCriteria Criterio para encontrar el vértice de origen del recorrido
+     * @param consumer Funcion que se ejecuta al visitar cada vértice
+     * @param <V> Tipo generico de vertices
+     * @param <D> Tipo generico de arcos
+     */
+
     @Override
     public <V, D> void recorridoEnProfundidad(IGraph<V, D> grafo, Comparable<V> sourceCriteria, Consumer<V> consumer) {
         V verticeInicial = grafo.buscarVertice(sourceCriteria);
