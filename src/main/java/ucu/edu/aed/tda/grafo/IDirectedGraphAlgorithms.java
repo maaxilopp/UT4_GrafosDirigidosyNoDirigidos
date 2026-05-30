@@ -16,7 +16,6 @@ public interface IDirectedGraphAlgorithms {
      * ejecuta el algoritmos Dijkstra sobre el grafo pasado y utilizando source como vértice de origen
      */
     <V, D extends WeightedEdge> IDijkstraResult<V> dijkstra(Comparable<V> source, IDirectedIGraph<V, D> grafo);
-
     /**
      * ejecuta Floyd sobre el grafo pasado, sabiendo que el grafo es weighted
      */
