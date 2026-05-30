@@ -57,9 +57,9 @@ public class GrafoDirigido implements IDirectedGraphAlgorithms {
         consumer.accept(verticeActual);
 
         for(Edge<V, D> arista : grafo.adyacencias(grafo.construirComparable(verticeActual))) {
-            V vecino = arista.target();
-            if (!visitados.contains(vecino)) {
-                recorridoEnProfundidadRecursivo(grafo, vecino, consumer, visitados);
+            V adyascente = arista.target();
+            if (!visitados.contains(adyascente)) {
+                recorridoEnProfundidadRecursivo(grafo, adyascente, consumer, visitados);
             }
         }
     }
