@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class GrafoDirigido implements IDirectedGraphAlgorithms {
+public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
     @Override
     public <V, D extends WeightedEdge> IDijkstraResult<V> dijkstra(Comparable<V> source, IDirectedIGraph<V, D> grafo) {
         return null;
