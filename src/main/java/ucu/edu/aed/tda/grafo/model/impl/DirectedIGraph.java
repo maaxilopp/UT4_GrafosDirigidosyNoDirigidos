@@ -67,11 +67,40 @@ public class DirectedIGraph<V, D> implements IDirectedIGraph<V, D> {
         return listaDeAdyacencia.get(source).add(new DirectedEdge<>(source, target, dato));
     }
 
+    /**
+     * Intenta eliminar una arista del grafo, validando que tanto el origen como el destino
+     * sean parte de la lista de adyacencia, en caso de que si, si existe esa arista se retorna true,
+     * en caso de que no exista ya sea el destino o origen o la arista en la lista, se retorna false.
+     * Orden: O(n), usa buscarVertice en dos for no anidadados, el removeIf es O(grado del vertice),
+     * en total quedaría O(n + n + grados del vertice), se redondea, como vimos en clase, en O(n).
+     * @param source origen de la arista
+     * @param target destino de la arista
+     * @return true o false dependiendo de si pudo eliminar la arista o no, respectivamente.
+     */
     @Override
-    public boolean eliminarArista(Comparable<V> source, Comparable<V> target) { return false; }
+    public boolean eliminarArista(Comparable<V> source, Comparable<V> target) {
+        V origen = buscarVertice(source);
+        V destino = buscarVertice(target);
+    if (origen == null || destino == null) return false;
+    return listaDeAdyacencia.get(origen).removeIf(e -> target.compareTo(e.target()) == 0);
+    }
 
+    /**
+     * Intenta eliminar un vertice y todas sus aristas asociadas, validando que el vertice exista en
+     * la lista de adyacencia, si no existe se retorna false, en caso de que exista, se eliminan todas
+     * las aristas que tengan como destino a ese vertice, y luego se elimina el vertice de la lista de
+     * adyacencia. Orden: O(vertices + aristas) porque revisa todas las aristas y vertices de la lista
+     * para asegurarse de que  sea exterminado por completo, no dejando rastros de su existencia en el grafo.
+     * @param criteria criterio de busqueda
+     * @return true o false, dependiendo de las circunstancias.
+     */
     @Override
-    public boolean removerVertice(Comparable<V> criteria) { return false; }
+    public boolean removerVertice(Comparable<V> criteria) {
+        V vertice = buscarVertice(criteria);
+        if (vertice == null) return false;
+        listaDeAdyacencia.values().forEach(aristas -> aristas.removeIf(e -> e.target().equals(vertice)));
+        return listaDeAdyacencia.remove(vertice) != null;
+    }
 
     @Override
     public Set<V> vertices() { return Set.of(); }
@@ -79,8 +108,19 @@ public class DirectedIGraph<V, D> implements IDirectedIGraph<V, D> {
     @Override
     public Set<Edge> aristas() { return Set.of(); }
 
+    /**
+     *Verifica si existe una arista entre dos vertices, validando que ambos
+     *existan en la lista de adyacencia y que la arista exista entre ellos.
+     * Orden: O(n), usa buscarVertice, el contains es O(grado del vertice),
+     * en total quedaría O(n + grados del vertice), se redondea, como vimos en clase, en O(n).
+     * @param sourceCriteria criterio de origen de la arista
+     * @param targetCriteria criterio de a donde apunta la arista
+     * @return true o false, depende de si existe o no la arista.
+     */
     @Override
-    public boolean existeArista(Comparable<V> sourceCriteria, Comparable<V> targetCriteria) { return false; }
+    public boolean existeArista(Comparable<V> sourceCriteria, Comparable<V> targetCriteria) {
+        return obtenerArista(sourceCriteria, targetCriteria) != null;
+    }
 
     @Override
     public Edge<V, D> obtenerArista(Comparable<V> sourceCriteria, Comparable<V> targetCriteria) { return null; }
@@ -91,8 +131,15 @@ public class DirectedIGraph<V, D> implements IDirectedIGraph<V, D> {
     @Override
     public boolean esConexo() { return false; }
 
+
+    /**
+     * Vacia la lista de adyacencia eliminando todos los vertices y aristas que existían en ella.
+     * Orden: O(n), recorre todo el hashmap y poniendole null a todos los pares clave-valor.
+     */
     @Override
-    public void vaciar() {}
+    public void vaciar() {
+        listaDeAdyacencia.clear();
+    }
 
     @Override
     public boolean tieneCiclos() { return false; }
