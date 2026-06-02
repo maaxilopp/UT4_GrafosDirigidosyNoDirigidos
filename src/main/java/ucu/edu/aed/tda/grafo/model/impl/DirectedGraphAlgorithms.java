@@ -58,8 +58,14 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
     @Override
     public <V, D> void recorridoEnProfundidad(IGraph<V, D> grafo, Comparable<V> sourceCriteria, Consumer<V> consumer) {
         V verticeInicial = grafo.buscarVertice(sourceCriteria);
+        if (verticeInicial == null) return;
         Set<V> visitados = new HashSet<>();
         recorridoEnProfundidadRecursivo(grafo, verticeInicial, consumer, visitados);
+        for (V vertice : grafo.vertices()) {
+            if (!visitados.contains(vertice)) {
+                recorridoEnProfundidadRecursivo(grafo, vertice, consumer, visitados);
+            }
+        }
     }
 
     private <V, D> void recorridoEnProfundidadRecursivo(IGraph<V, D> grafo, V verticeActual, Consumer<V> consumer, Set<V> visitados) {
@@ -67,9 +73,9 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         consumer.accept(verticeActual);
 
         for(Edge<V, D> arista : grafo.adyacencias(grafo.construirComparable(verticeActual))) {
-            V adyascente = arista.target();
-            if (!visitados.contains(adyascente)) {
-                recorridoEnProfundidadRecursivo(grafo, adyascente, consumer, visitados);
+            V adyacente = arista.target();
+            if (!visitados.contains(adyacente)) {
+                recorridoEnProfundidadRecursivo(grafo, adyacente, consumer, visitados);
             }
         }
     }

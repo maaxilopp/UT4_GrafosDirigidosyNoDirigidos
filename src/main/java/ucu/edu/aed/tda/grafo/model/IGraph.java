@@ -49,7 +49,7 @@ public interface IGraph<V, D> {
     /**
      * Conjunto de aristas (preferible vista inmodificable).
      */
-    Set<Edge<V, D>> aristas();
+    Set<Edge> aristas();
 
     /**
      * ¿Existe el vértice v?

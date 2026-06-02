@@ -6,79 +6,50 @@ import ucu.edu.aed.tda.grafo.model.edge.Edge;
 import java.util.List;
 import java.util.Set;
 
-public class DirectedIGraph implements IDirectedIGraph {
-    @Override
-    public Set successors(Comparable criteria) {
-        return Set.of();
-    }
+public class DirectedIGraph<V, D> implements IDirectedIGraph<V, D> {
 
     @Override
-    public Set predecessors(Comparable criteria) {
-        return Set.of();
-    }
+    public Set<V> successors(Comparable<V> criteria) { return Set.of(); }
 
     @Override
-    public boolean agregarVertice(Object vertex) {
-        return false;
-    }
+    public Set<V> predecessors(Comparable<V> criteria) { return Set.of(); }
 
     @Override
-    public Object buscarVertice(Comparable criterio) {
-        return null;
-    }
+    public boolean agregarVertice(V vertex) { return false; }
 
     @Override
-    public boolean agregarArista(Object source, Object target, Object dato) {
-        return false;
-    }
+    public V buscarVertice(Comparable<V> criterio) { return null; }
 
     @Override
-    public boolean eliminarArista(Comparable source, Comparable target) {
-        return false;
-    }
+    public boolean agregarArista(V source, V target, D dato) { return false; }
 
     @Override
-    public boolean removerVertice(Comparable criteria) {
-        return false;
-    }
+    public boolean eliminarArista(Comparable<V> source, Comparable<V> target) { return false; }
 
     @Override
-    public Set vertices() {
-        return Set.of();
-    }
+    public boolean removerVertice(Comparable<V> criteria) { return false; }
 
     @Override
-    public Set<Edge> aristas() {
-        return Set.of();
-    }
+    public Set<V> vertices() { return Set.of(); }
 
     @Override
-    public boolean existeArista(Comparable sourceCriteria, Comparable targetCriteria) {
-        return false;
-    }
+    public Set<Edge<V, D>> aristas() { return Set.of(); }
 
     @Override
-    public Edge obtenerArista(Comparable sourceCriteria, Comparable targetCriteria) {
-        return null;
-    }
+    public boolean existeArista(Comparable<V> sourceCriteria, Comparable<V> targetCriteria) { return false; }
 
     @Override
-    public List<Edge> adyacencias(Comparable verticeCriteria) {
-        return List.of();
-    }
+    public Edge<V, D> obtenerArista(Comparable<V> sourceCriteria, Comparable<V> targetCriteria) { return null; }
 
     @Override
-    public boolean esConexo() {
-        return false;
-    }
+    public List<Edge<V, D>> adyacencias(Comparable<V> verticeCriteria) { return List.of(); }
 
     @Override
-    public void vaciar() {
-
-    }
+    public boolean esConexo() { return false; }
 
     @Override
-    public boolean tieneCiclos() {
-        return false;
-    }
+    public void vaciar() {}
+
+    @Override
+    public boolean tieneCiclos() { return false; }
 }
