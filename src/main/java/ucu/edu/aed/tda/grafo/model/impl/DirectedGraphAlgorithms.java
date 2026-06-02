@@ -62,42 +62,53 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
 
     /**
      * El algoritmo calcula las distancias mínimas entre todos los pares de vértices.
-     * Se inicializa una matriz de distancias con los pesos de las aristas, y luego se actualiza iterativamente considerando cada vértice como posible intermediario.
-     * @param grafo
-     * @param <V>
-     * @param <D>
-     * @return FloydWarshallResult con la matriz de distancias mínimas entre todos los pares de vértices.
+     * Se inicializa una matriz de distancias con los pesos de las aristas, y luego
+     * se actualiza iterativamente considerando cada vértice como posible intermediario.
+     * Orden: O(vertices al cubo), hay tres bucles "for" anidadados. Es extremadamente
+     * costoso para grafos grandes, pero es un algoritmo clásico para este problema.
+     * @param grafo grafo al que se le calculará las distancias mínimas de los vertices.
+     * @param <V> tipo genérico de los vértices del grafo
+     * @param <D> tipo genérico de los datos asociados a las aristas, que deben ser ponderados (tener peso).
+     * @return  las distancias mínimas entre todos los pares de vértices.
      */
     @Override
     public <V, D extends WeightedEdge> IFloydWarshallResult<V> floyd(IDirectedIGraph<V, D> grafo) {
         List<V> vertices = new ArrayList<>(grafo.vertices());
         int n = vertices.size();
 
-        double[][] dist = new double[n][n];
+        Map<V, Integer> indices = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            indices.put(vertices.get(i), i);
+        }
 
-        // Inicialización
+        double[][] dist = new double[n][n];
+        int[][] next = new int[n][n];
+
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
+                next[i][j] = -1; // por defecto, sin camino conocido
 
                 if (i == j) {
                     dist[i][j] = 0;
+                    next[i][j] = j;
                     continue;
                 }
 
                 Edge<V, D> arista = grafo.obtenerArista(
-                        (Comparable<V>) vertices.get(i),
-                        (Comparable<V>) vertices.get(j)
+                        grafo.construirComparable(vertices.get(i)),
+                        grafo.construirComparable(vertices.get(j))
                 );
 
                 if (arista != null) {
                     dist[i][j] = arista.dato().getWeight();
+                    next[i][j] = j; // el siguiente paso para ir de i a j es j, porque hay una arista directa
                 } else {
                     dist[i][j] = Double.POSITIVE_INFINITY;
                 }
             }
         }
 
-        // Floyd-Warshall
+        // probar cada k como intermedio
         for (int k = 0; k < n; k++) {
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
@@ -107,16 +118,18 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
                             && dist[i][k] + dist[k][j] < dist[i][j]) {
 
                         dist[i][j] = dist[i][k] + dist[k][j];
+                        next[i][j] = next[i][k]; // el siguiente paso para ir de i a j es el mismo que el siguiente paso para ir de i a k, porque k es el nuevo intermedio más corto
                     }
                 }
             }
         }
 
-        return new FloydWarshallResult<>(dist);
+        return new FloydWarshallResult<>(dist, null, next, indices, vertices);
     }
 
     /***
-     * El algoritmo de Warshall se utiliza para determinar la transitividad en un grafo dirigido, es decir, si existe un camino entre dos vértices.
+     * El algoritmo de Warshall se utiliza para determinar Si existe un camino entre dos vértices.
+     * Al ser basicamente un Floyd booleano, su orden es O(vertices al cubo), al igual que Floyd.
      * @param grafo
      * @return Una matriz booleana donde el valor en la posición (i, j) es true si existe un camino desde el vértice i al vértice j, y false en caso contrario.
      * @param <V>
@@ -124,8 +137,42 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      */
     @Override
     public <V, D extends WeightedEdge> IFloydWarshallResult<V> warshall(IDirectedIGraph<V, D> grafo) {
-        return floyd(grafo);
+        List<V> vertices = new ArrayList<>(grafo.vertices());
+        int n = vertices.size();
+        Map<V, Integer> indices = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            indices.put(vertices.get(i), i);
+        }
+
+        boolean[][] hayCamino = new boolean[n][n];
+
+        // hay camino directo si existe una arista, y hay camino a sí mismo
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    hayCamino[i][j] = true;
+                    continue;
+                }
+                Edge<V, D> arista = grafo.obtenerArista(
+                        grafo.construirComparable(vertices.get(i)),
+                        grafo.construirComparable(vertices.get(j))
+                );
+                hayCamino[i][j] = (arista != null);
+            }
+        }
+
+        // hay camino de i a j si ya había uno, o si hay camino de i a k y de k a j
+        for (int k = 0; k < n; k++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    hayCamino[i][j] = hayCamino[i][j] || (hayCamino[i][k] && hayCamino[k][j]);
+                }
+            }
+        }
+
+        return new FloydWarshallResult<>(null, hayCamino, null, indices, vertices);
     }
+
 
     @Override
     public <V, D extends WeightedEdge> V obtenerCentroGrafo(IDirectedIGraph<V, D> grafo) {
@@ -146,7 +193,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * Recorrido en profundidad del grafo comenzando desde el vértice que cumple sourceCriteria.
      * Si el grafo no es conexo, continúa el recorrido desde los vértices no alcanzados,
      * garantizando que todos los vértices sean visitados exactamente una vez.
-     * Orden: O(Vertices + Aristas)
+     * Orden: O(Vertices + Aristas), pasa por todos los vertices y aristas del grafo una vez exactamente.
      *
      * @param grafo          grafo a recorrer
      * @param sourceCriteria criterio para encontrar el vértice de origen del recorrido
