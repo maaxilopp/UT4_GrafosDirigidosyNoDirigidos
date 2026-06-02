@@ -164,7 +164,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
     }
 
     /**
-     * Método recursivo auxiliar del recorrido en profundidad.
+     * Metodo recursivo auxiliar del recorrido en profundidad.
      * Si el vértice ya fue visitado retorna inmediatamente.
      * Si no, lo marca como visitado, aplica el consumer y recurre sobre sus adyacentes.
      * @param grafo         grafo a recorrer
