@@ -9,6 +9,7 @@ import ucu.edu.aed.tda.grafo.model.result.IDijkstraResult;
 import ucu.edu.aed.tda.grafo.model.result.IFloydWarshallResult;
 import ucu.edu.aed.tda.grafo.model.result.Path;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,12 +23,54 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
 
     @Override
     public <V, D extends WeightedEdge> IFloydWarshallResult<V> floyd(IDirectedIGraph<V, D> grafo) {
-        return null;
+        List<V> vertices = new ArrayList<>(grafo.vertices());
+        int n = vertices.size();
+
+        double[][] dist = new double[n][n];
+
+        // Inicialización
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+
+                if (i == j) {
+                    dist[i][j] = 0;
+                    continue;
+                }
+
+                Edge<V, D> arista = grafo.obtenerArista(
+                        (Comparable<V>) vertices.get(i),
+                        (Comparable<V>) vertices.get(j)
+                );
+
+                if (arista != null) {
+                    dist[i][j] = arista.dato().getWeight();
+                } else {
+                    dist[i][j] = Double.POSITIVE_INFINITY;
+                }
+            }
+        }
+
+        // Floyd-Warshall
+        for (int k = 0; k < n; k++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+
+                    if (dist[i][k] != Double.POSITIVE_INFINITY
+                            && dist[k][j] != Double.POSITIVE_INFINITY
+                            && dist[i][k] + dist[k][j] < dist[i][j]) {
+
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                    }
+                }
+            }
+        }
+
+        return new FloydWarshallResult<>(dist);
     }
 
     @Override
     public <V, D extends WeightedEdge> IFloydWarshallResult<V> warshall(IDirectedIGraph<V, D> grafo) {
-        return null;
+        return floyd(grafo);
     }
 
     @Override
