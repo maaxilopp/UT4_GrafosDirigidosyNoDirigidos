@@ -160,9 +160,18 @@ public class DirectedIGraph<V, D> implements IDirectedIGraph<V, D> {
         return Collections.unmodifiableSet(listaDeAdyacencia.keySet());
     }
 
+    /**
+     * Devuelve un hashset con todas las aristas del grafo, recorriendo los valores del hashmap de la lista de adyacencia
+     * y agregando todas las aristas a un hashset resultado. Orden: O(vertices + aristas) porque recorre todos los vertices y aristas del grafo.
+     *
+     * @return un hashset con todas las aristas del grafo.
+     */
     @Override
+    @SuppressWarnings("unchecked")
     public Set<Edge> aristas() {
-        return Set.of();
+        Set<Edge> result = new HashSet<>();
+        listaDeAdyacencia.values().forEach(result::addAll);
+        return result;
     }
 
     /**
