@@ -47,7 +47,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
 
     /**
      * Recorrido en profundidad de un grafo dirigido, utilizando un hashset para controlar los vértices visitados y corroborar en O(1)
-     * y evitar ciclos infinitos.
+     * y evitar ciclos infinitos. Orden: O(Vertices + Aristas) ya que se visitan todos los vértices y aristas del grafo exactamente una vez.
      * @param grafo Grafo dirigido que se va a recorrer en profundidad
      * @param sourceCriteria Criterio para encontrar el vértice de origen del recorrido
      * @param consumer Funcion que se ejecuta al visitar cada vértice
