@@ -57,7 +57,7 @@ public class DirectedIGraph<V, D> implements IDirectedIGraph<V, D> {
      * @param source Vertice de origen de la arista
      * @param target Vertice destino de la arista
      * @param dato info (peso) de la arista
-     * @return
+     * @return true o false de acuerdo a si pudo o no agregarla.
      */
     @Override
     public boolean agregarArista(V source, V target, D dato) {
