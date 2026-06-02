@@ -46,15 +46,15 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
     }
 
     /**
-     * Recorrido en profundidad de un grafo dirigido, utilizando un hashset para controlar los vértices visitados y corroborar en O(1)
-     * y evitar ciclos infinitos. Orden: O(Vertices + Aristas) ya que se visitan todos los vértices y aristas del grafo exactamente una vez.
-     * @param grafo Grafo dirigido que se va a recorrer en profundidad
-     * @param sourceCriteria Criterio para encontrar el vértice de origen del recorrido
-     * @param consumer Funcion que se ejecuta al visitar cada vértice
-     * @param <V> Tipo generico de vertices
-     * @param <D> Tipo generico de arcos
+     * Recorrido en profundidad del grafo comenzando desde el vértice que cumple sourceCriteria.
+     * Si el grafo no es conexo, continúa el recorrido desde los vértices no alcanzados,
+     * garantizando que todos los vértices sean visitados exactamente una vez.
+     * Orden: O(Vertices + Aristas)
+     *
+     * @param grafo          grafo a recorrer
+     * @param sourceCriteria criterio para encontrar el vértice de origen del recorrido
+     * @param consumer       función que se ejecuta al visitar cada vértice
      */
-
     @Override
     public <V, D> void recorridoEnProfundidad(IGraph<V, D> grafo, Comparable<V> sourceCriteria, Consumer<V> consumer) {
         V verticeInicial = grafo.buscarVertice(sourceCriteria);
@@ -62,21 +62,25 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         Set<V> visitados = new HashSet<>();
         recorridoEnProfundidadRecursivo(grafo, verticeInicial, consumer, visitados);
         for (V vertice : grafo.vertices()) {
-            if (!visitados.contains(vertice)) {
-                recorridoEnProfundidadRecursivo(grafo, vertice, consumer, visitados);
-            }
+            recorridoEnProfundidadRecursivo(grafo, vertice, consumer, visitados);
         }
     }
 
+    /**
+     * Método recursivo auxiliar del recorrido en profundidad.
+     * Si el vértice ya fue visitado retorna inmediatamente.
+     * Si no, lo marca como visitado, aplica el consumer y recurre sobre sus adyacentes.
+     * @param grafo         grafo a recorrer
+     * @param verticeActual vértice que se está procesando en esta llamada
+     * @param consumer      función que se ejecuta al visitar cada vértice
+     * @param visitados     conjunto compartido de vértices ya visitados, consultado en O(1)
+     */
     private <V, D> void recorridoEnProfundidadRecursivo(IGraph<V, D> grafo, V verticeActual, Consumer<V> consumer, Set<V> visitados) {
+        if (visitados.contains(verticeActual)) return;
         visitados.add(verticeActual);
         consumer.accept(verticeActual);
-
-        for(Edge<V, D> arista : grafo.adyacencias(grafo.construirComparable(verticeActual))) {
-            V adyacente = arista.target();
-            if (!visitados.contains(adyacente)) {
-                recorridoEnProfundidadRecursivo(grafo, adyacente, consumer, visitados);
-            }
+        for (Edge<V, D> arista : grafo.adyacencias(grafo.construirComparable(verticeActual))) {
+            recorridoEnProfundidadRecursivo(grafo, arista.target(), consumer, visitados);
         }
     }
 
