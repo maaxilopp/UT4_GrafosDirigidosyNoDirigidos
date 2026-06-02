@@ -33,7 +33,7 @@ public class DirectedIGraph<V, D> implements IDirectedIGraph<V, D> {
     public Set<V> vertices() { return Set.of(); }
 
     @Override
-    public Set<Edge<V, D>> aristas() { return Set.of(); }
+    public Set<Edge> aristas() { return Set.of(); }
 
     @Override
     public boolean existeArista(Comparable<V> sourceCriteria, Comparable<V> targetCriteria) { return false; }
