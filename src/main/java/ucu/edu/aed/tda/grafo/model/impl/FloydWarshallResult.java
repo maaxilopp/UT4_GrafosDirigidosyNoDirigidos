@@ -4,6 +4,10 @@ import ucu.edu.aed.tda.grafo.model.result.IFloydWarshallResult;
 
 import java.util.List;
 
+/**
+ * Implementacion de IFloydWarshallResult, esta clase se encarga de modelar el resultado de ejecutar el algoritmo de floyd y warshall
+ * @param <V>
+ */
 public class FloydWarshallResult<V> implements IFloydWarshallResult<V> {
     private final double[][] distancias;
 

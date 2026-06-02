@@ -60,6 +60,14 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         return new DijkstraResult<>(d, p);
     }
 
+    /**
+     * El algoritmo calcula las distancias mínimas entre todos los pares de vértices.
+     * Se inicializa una matriz de distancias con los pesos de las aristas, y luego se actualiza iterativamente considerando cada vértice como posible intermediario.
+     * @param grafo
+     * @param <V>
+     * @param <D>
+     * @return FloydWarshallResult con la matriz de distancias mínimas entre todos los pares de vértices.
+     */
     @Override
     public <V, D extends WeightedEdge> IFloydWarshallResult<V> floyd(IDirectedIGraph<V, D> grafo) {
         List<V> vertices = new ArrayList<>(grafo.vertices());
@@ -107,6 +115,13 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         return new FloydWarshallResult<>(dist);
     }
 
+    /***
+     * El algoritmo de Warshall se utiliza para determinar la transitividad en un grafo dirigido, es decir, si existe un camino entre dos vértices.
+     * @param grafo
+     * @return Una matriz booleana donde el valor en la posición (i, j) es true si existe un camino desde el vértice i al vértice j, y false en caso contrario.
+     * @param <V>
+     * @param <D>
+     */
     @Override
     public <V, D extends WeightedEdge> IFloydWarshallResult<V> warshall(IDirectedIGraph<V, D> grafo) {
         return floyd(grafo);
