@@ -10,15 +10,54 @@ import ucu.edu.aed.tda.grafo.model.result.IFloydWarshallResult;
 import ucu.edu.aed.tda.grafo.model.result.Path;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
+
+    /**
+     * Algoritmo de Dijkstra sobre el grafo desde el vértice "origen".
+     * Calcula el camino mínimo desde el origen a todos los demás vértices.
+     * Orden: O((V + A) log V) usando cola de prioridad para comparar caminos.
+     *
+     * @param source criterio para encontrar el vértice de origen
+     * @param grafo  grafo dirigido sobre el que se ejecuta el algoritmo
+     * @return resultado con las distancias mínimas y predecesores para recuperar caminos
+     */
     @Override
     public <V, D extends WeightedEdge> IDijkstraResult<V> dijkstra(Comparable<V> source, IDirectedIGraph<V, D> grafo) {
-        return null;
+        V origen = grafo.buscarVertice(source);
+        if (origen == null) {
+            return null;
+        }
+        Set<V> s = new HashSet<>(); // vértices cuya distancia mínima ya es conocida
+        Map<V, Double> d = new HashMap<>(); // distancia mínima desde el origen a cada vértice
+        Map<V, V> p = new HashMap<>(); // predecesor de cada vértice en el camino mínimo
+
+        for (V vertice : grafo.vertices()) {
+            d.put(vertice, Double.POSITIVE_INFINITY);
+            p.put(vertice, null);
+        }
+        d.put(origen, 0.0);
+
+        PriorityQueue<V> colaPrioridad = new PriorityQueue<>(Comparator.comparingDouble(d::get));
+        colaPrioridad.add(origen);
+
+        while (!colaPrioridad.isEmpty()) {
+            V verticeMinimo = colaPrioridad.poll();
+            if (s.contains(verticeMinimo)) continue;
+            s.add(verticeMinimo);
+            for (Edge<V, D> arista : grafo.adyacencias(grafo.construirComparable(verticeMinimo))) {
+                V vecino = arista.target();
+                double pesoArista = arista.dato().getWeight();
+                if (d.get(verticeMinimo) + pesoArista < d.get(vecino)) {
+                    d.put(vecino, d.get(verticeMinimo) + pesoArista);
+                    p.put(vecino, verticeMinimo);
+                    colaPrioridad.add(vecino);
+                }
+            }
+        }
+        return new DijkstraResult<>(d, p);
     }
 
     @Override
