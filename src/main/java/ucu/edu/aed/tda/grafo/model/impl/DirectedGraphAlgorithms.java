@@ -267,8 +267,8 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
 
     /**
      * Recorrido en amplitud del grafo comenzando desde el vértice que cumple con el criterio.
-     * Orden: O(Vertices + Aristas), pasa por todos los vertices y aristas del grafo (alcanzables) una vez exactamente.
-     *
+     * Orden: O(Vertices^2 + Aristas), porque adyacencias() resuelve el vértice con buscarVertice()
+     * en O(Vertices) y se invoca una vez por cada vértice desencolado.
      * @param grafo          grafo a recorrer
      * @param sourceCriteria criterio para encontrar el vértice de origen del recorrido
      * @param consumer       función que se ejecuta al visitar cada vértice
