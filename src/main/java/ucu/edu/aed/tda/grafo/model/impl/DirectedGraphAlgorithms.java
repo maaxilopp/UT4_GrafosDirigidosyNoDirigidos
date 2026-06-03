@@ -233,7 +233,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
 
     /**
      * Recorrido en profundidad del grafo comenzando desde el vértice que cumple con el criterio.
-     * Orden: O(Vertices + Aristas), pasa por todos los vertices y aristas del grafo una vez exactamente.
+     * Orden: O(Vertices + Aristas), pasa por todos los vertices y aristas del grafo (alcanzables) una vez exactamente.
      *
      * @param grafo          grafo a recorrer
      * @param sourceCriteria criterio para encontrar el vértice de origen del recorrido
@@ -265,8 +265,33 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         }
     }
 
+    /**
+     * Recorrido en amplitud del grafo comenzando desde el vértice que cumple con el criterio.
+     * Orden: O(Vertices + Aristas), pasa por todos los vertices y aristas del grafo (alcanzables) una vez exactamente.
+     *
+     * @param grafo          grafo a recorrer
+     * @param sourceCriteria criterio para encontrar el vértice de origen del recorrido
+     * @param consumer       función que se ejecuta al visitar cada vértice
+     */
     @Override
     public <V, D> void recorridoEnAmplitud(IGraph<V, D> grafo, Comparable<V> sourceCriteria, Consumer<V> consumer) {
+        V verticeInicial = grafo.buscarVertice(sourceCriteria);
+        if (verticeInicial == null) return;
+        Set<V> visitados = new HashSet<>();
+        Queue<V> cola = new LinkedList<>();
+        visitados.add(verticeInicial);
+        cola.add(verticeInicial);
+        while (!cola.isEmpty()) {
+            V verticeActual = cola.poll();
+            consumer.accept(verticeActual);
+            for (Edge<V, D> arista : grafo.adyacencias(grafo.construirComparable(verticeActual))) {
+                V vecino = arista.target();
+                if (!visitados.contains(vecino)) {
+                    visitados.add(vecino);
+                    cola.add(vecino);
+                }
+            }
+        }
 
     }
 
