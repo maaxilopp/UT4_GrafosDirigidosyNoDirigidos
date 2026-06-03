@@ -130,10 +130,10 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
     /***
      * El algoritmo de Warshall se utiliza para determinar Si existe un camino entre dos vértices.
      * Al ser basicamente un Floyd booleano, su orden es O(vertices al cubo), al igual que Floyd.
-     * @param grafo
+     * @param grafo grafo de prueba
      * @return Una matriz booleana donde el valor en la posición (i, j) es true si existe un camino desde el vértice i al vértice j, y false en caso contrario.
-     * @param <V>
-     * @param <D>
+     * @param <V> generico de los vertices del grafo.
+     * @param <D> genérico de los datos asociados a las aristas, que deben ser ponderados (tener peso).
      */
     @Override
     public <V, D extends WeightedEdge> IFloydWarshallResult<V> warshall(IDirectedIGraph<V, D> grafo) {
@@ -179,9 +179,33 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         return null;
     }
 
+    /**
+     * La excentricidad de un vértice es la distancia máxima desde ese vértice a cualquier otro vértice alcanzable en el grafo.
+     * Para calcularla, se puede ejecutar el algoritmo de Floyd para obtener las distancias mínimas entre todos los pares de vértices,
+     * y luego encontrar la distancia máxima desde el vértice dado a cualquier otro vértice alcanzable. Al usar Floyd para obtener todas
+     * las conexiones de un grafo, el orden es O(vertices al cubo).
+     * @param grafo grafo al que se le desea obtener la excentricidad de un vertice.
+     * @param vertexCriteria vertice del grafo que cumple con el criterio de busqueda.
+     * @return la distancia al vértice más lejano alcanzable, o infinito si el vértice no existe en el grafo.
+     * @param <V> generico de los vertices de un grafo.
+     * @param <D> genérico de los datos asociados a las aristas, que deben ser ponderados (tener peso).
+     */
     @Override
     public <V, D extends WeightedEdge> double obtenerExcentricidad(IDirectedIGraph<V, D> grafo, Comparable<V> vertexCriteria) {
-        return 0;
+        V vertice = grafo.buscarVertice(vertexCriteria);
+        if(vertice == null){
+            return Double.POSITIVE_INFINITY;
+        }
+        IFloydWarshallResult<V> resultadoFloyd = floyd(grafo);
+        double excentricidad = 0;
+        for(V otroVertice : grafo.vertices()){
+            double distancia = resultadoFloyd.getCost(vertice, otroVertice);
+            if(distancia != Double.POSITIVE_INFINITY){
+                excentricidad = Math.max(excentricidad, distancia);
+            }
+
+        }
+        return excentricidad;
     }
 
     @Override
