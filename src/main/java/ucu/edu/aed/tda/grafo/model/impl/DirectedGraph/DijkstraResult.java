@@ -1,4 +1,4 @@
-package ucu.edu.aed.tda.grafo.model.impl;
+package ucu.edu.aed.tda.grafo.model.impl.DirectedGraph;
 
 import ucu.edu.aed.tda.grafo.model.result.IDijkstraResult;
 

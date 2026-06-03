@@ -2,8 +2,8 @@ package test;
 
 import junit.framework.TestCase;
 import ucu.edu.aed.tda.grafo.model.edge.WeightedEdge;
-import ucu.edu.aed.tda.grafo.model.impl.DirectedGraphAlgorithms;
-import ucu.edu.aed.tda.grafo.model.impl.DirectedIGraph;
+import ucu.edu.aed.tda.grafo.model.impl.DirectedGraph.DirectedGraphAlgorithms;
+import ucu.edu.aed.tda.grafo.model.impl.DirectedGraph.DirectedIGraph;
 import ucu.edu.aed.tda.grafo.model.result.IDijkstraResult;
 import ucu.edu.aed.tda.grafo.model.result.IFloydWarshallResult;
 

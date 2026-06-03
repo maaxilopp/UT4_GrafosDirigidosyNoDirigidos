@@ -2,7 +2,7 @@ package test;
 
 import junit.framework.TestCase;
 import ucu.edu.aed.tda.grafo.model.edge.WeightedEdge;
-import ucu.edu.aed.tda.grafo.model.impl.DirectedIGraph;
+import ucu.edu.aed.tda.grafo.model.impl.DirectedGraph.DirectedIGraph;
 
 import java.util.List;
 import java.util.Set;
