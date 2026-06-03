@@ -84,46 +84,40 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         double[][] dist = new double[n][n];
         int[][] next = new int[n][n];
 
+
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                next[i][j] = -1; // por defecto, sin camino conocido
+                dist[i][j] = (i == j) ? 0 : Double.POSITIVE_INFINITY;
+                next[i][j] = (i == j) ? j : -1;
+            }
+        }
 
-                if (i == j) {
-                    dist[i][j] = 0;
-                    next[i][j] = j;
-                    continue;
-                }
 
-                Edge<V, D> arista = grafo.obtenerArista(
-                        grafo.construirComparable(vertices.get(i)),
-                        grafo.construirComparable(vertices.get(j))
-                );
-
-                if (arista != null) {
+        for (int i = 0; i < n; i++) {
+            V origen = vertices.get(i);
+            for (Edge<V, D> arista : grafo.adyacencias(grafo.construirComparable(origen))) {
+                Integer j = indices.get(arista.target());
+                if (j != null) {
                     dist[i][j] = arista.dato().getWeight();
-                    next[i][j] = j; // el siguiente paso para ir de i a j es j, porque hay una arista directa
-                } else {
-                    dist[i][j] = Double.POSITIVE_INFINITY;
+                    next[i][j] = j;
                 }
             }
         }
 
-        // probar cada k como intermedio
+
         for (int k = 0; k < n; k++) {
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-
                     if (dist[i][k] != Double.POSITIVE_INFINITY
                             && dist[k][j] != Double.POSITIVE_INFINITY
                             && dist[i][k] + dist[k][j] < dist[i][j]) {
 
                         dist[i][j] = dist[i][k] + dist[k][j];
-                        next[i][j] = next[i][k]; // el siguiente paso para ir de i a j es el mismo que el siguiente paso para ir de i a k, porque k es el nuevo intermedio más corto
+                        next[i][j] = next[i][k];
                     }
                 }
             }
         }
-
         return new FloydWarshallResult<>(dist, null, next, indices, vertices);
     }
 
@@ -194,11 +188,10 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
             double temporal = 0;
             for(V otroVertice : grafo.vertices()) {
                 double distancia = resultadoFloyd.getCost(vertice, otroVertice);
-                if(distancia != Double.POSITIVE_INFINITY){
-                    temporal = Math.max(temporal, distancia);
-                }
+                temporal = Math.max(temporal, distancia);
+
             }
-            if (temporal < menorExcentricidad) {
+            if (temporal < menorExcentricidad) { // precondicion: ante dos vértices con la misma excentricidad mínima nos quedamos con el primero que aparezca en la iteración.
                 menorExcentricidad = temporal;
                 centro = vertice;
             }
@@ -227,9 +220,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         double excentricidad = 0;
         for(V otroVertice : grafo.vertices()){
             double distancia = resultadoFloyd.getCost(vertice, otroVertice);
-            if(distancia != Double.POSITIVE_INFINITY){
-                excentricidad = Math.max(excentricidad, distancia);
-            }
+            excentricidad = Math.max(excentricidad, distancia);
 
         }
         return excentricidad;
