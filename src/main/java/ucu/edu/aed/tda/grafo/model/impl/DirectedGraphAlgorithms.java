@@ -127,7 +127,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         return new FloydWarshallResult<>(dist, null, next, indices, vertices);
     }
 
-    /***
+    /**
      * El algoritmo de Warshall se utiliza para determinar Si existe un camino entre dos vértices.
      * Al ser basicamente un Floyd booleano, su orden es O(vertices al cubo), al igual que Floyd.
      * @param grafo grafo de prueba
@@ -173,10 +173,37 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         return new FloydWarshallResult<>(null, hayCamino, null, indices, vertices);
     }
 
-
+    /**
+     * El centro del grafo es el vértice de menor excentricidad, es decir, el que está
+     * "mejor ubicado", el que en su peor caso llega más cerca que cualquier otro.
+     * Ejecuta Floyd una sola vez para tener todas las distancias mínimas, y luego
+     * calcula la excentricidad de cada vértice consultando ese resultado.
+     * Orden: O(vertices al cubo), dominado por la única ejecución de Floyd.
+     * @param grafo grafo al que se le calcula el centro.
+     * @return el vértice de menor excentricidad, o null si el grafo está vacío.
+     * @param <V> genérico de los vértices del grafo.
+     * @param <D> genérico de los datos asociados a las aristas, que deben ser ponderados.
+     */
     @Override
     public <V, D extends WeightedEdge> V obtenerCentroGrafo(IDirectedIGraph<V, D> grafo) {
-        return null;
+        IFloydWarshallResult<V> resultadoFloyd = floyd(grafo);
+        V centro = null;
+        double menorExcentricidad = Double.POSITIVE_INFINITY;
+
+        for(V vertice : grafo.vertices()) {
+            double temporal = 0;
+            for(V otroVertice : grafo.vertices()) {
+                double distancia = resultadoFloyd.getCost(vertice, otroVertice);
+                if(distancia != Double.POSITIVE_INFINITY){
+                    temporal = Math.max(temporal, distancia);
+                }
+            }
+            if (temporal < menorExcentricidad) {
+                menorExcentricidad = temporal;
+                centro = vertice;
+            }
+        }
+        return centro;
     }
 
     /**
