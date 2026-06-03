@@ -66,10 +66,11 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * se actualiza iterativamente considerando cada vértice como posible intermediario.
      * Orden: O(vertices al cubo), hay tres bucles "for" anidadados. Es extremadamente
      * costoso para grafos grandes, pero es un algoritmo clásico para este problema.
+     *
      * @param grafo grafo al que se le calculará las distancias mínimas de los vertices.
-     * @param <V> tipo genérico de los vértices del grafo
-     * @param <D> tipo genérico de los datos asociados a las aristas, que deben ser ponderados (tener peso).
-     * @return  las distancias mínimas entre todos los pares de vértices.
+     * @param <V>   tipo genérico de los vértices del grafo
+     * @param <D>   tipo genérico de los datos asociados a las aristas, que deben ser ponderados (tener peso).
+     * @return las distancias mínimas entre todos los pares de vértices.
      */
     @Override
     public <V, D extends WeightedEdge> IFloydWarshallResult<V> floyd(IDirectedIGraph<V, D> grafo) {
@@ -124,10 +125,11 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
     /**
      * El algoritmo de Warshall se utiliza para determinar Si existe un camino entre dos vértices.
      * Al ser basicamente un Floyd booleano, su orden es O(vertices al cubo), al igual que Floyd.
+     *
      * @param grafo grafo de prueba
+     * @param <V>   generico de los vertices del grafo.
+     * @param <D>   genérico de los datos asociados a las aristas, que deben ser ponderados (tener peso).
      * @return Una matriz booleana donde el valor en la posición (i, j) es true si existe un camino desde el vértice i al vértice j, y false en caso contrario.
-     * @param <V> generico de los vertices del grafo.
-     * @param <D> genérico de los datos asociados a las aristas, que deben ser ponderados (tener peso).
      */
     @Override
     public <V, D extends WeightedEdge> IFloydWarshallResult<V> warshall(IDirectedIGraph<V, D> grafo) {
@@ -173,10 +175,11 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * Ejecuta Floyd una sola vez para tener todas las distancias mínimas, y luego
      * calcula la excentricidad de cada vértice consultando ese resultado.
      * Orden: O(vertices al cubo), dominado por la única ejecución de Floyd.
+     *
      * @param grafo grafo al que se le calcula el centro.
+     * @param <V>   genérico de los vértices del grafo.
+     * @param <D>   genérico de los datos asociados a las aristas, que deben ser ponderados.
      * @return el vértice de menor excentricidad, o null si el grafo está vacío.
-     * @param <V> genérico de los vértices del grafo.
-     * @param <D> genérico de los datos asociados a las aristas, que deben ser ponderados.
      */
     @Override
     public <V, D extends WeightedEdge> V obtenerCentroGrafo(IDirectedIGraph<V, D> grafo) {
@@ -184,9 +187,9 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         V centro = null;
         double menorExcentricidad = Double.POSITIVE_INFINITY;
 
-        for(V vertice : grafo.vertices()) {
+        for (V vertice : grafo.vertices()) {
             double temporal = 0;
-            for(V otroVertice : grafo.vertices()) {
+            for (V otroVertice : grafo.vertices()) {
                 double distancia = resultadoFloyd.getCost(vertice, otroVertice);
                 temporal = Math.max(temporal, distancia);
 
@@ -204,21 +207,22 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * Para calcularla, se puede ejecutar el algoritmo de Floyd para obtener las distancias mínimas entre todos los pares de vértices,
      * y luego encontrar la distancia máxima desde el vértice dado a cualquier otro vértice alcanzable. Al usar Floyd para obtener todas
      * las conexiones de un grafo, el orden es O(vertices al cubo).
-     * @param grafo grafo al que se le desea obtener la excentricidad de un vertice.
+     *
+     * @param grafo          grafo al que se le desea obtener la excentricidad de un vertice.
      * @param vertexCriteria vertice del grafo que cumple con el criterio de busqueda.
+     * @param <V>            generico de los vertices de un grafo.
+     * @param <D>            genérico de los datos asociados a las aristas, que deben ser ponderados (tener peso).
      * @return la distancia al vértice más lejano alcanzable, o infinito si el vértice no existe en el grafo.
-     * @param <V> generico de los vertices de un grafo.
-     * @param <D> genérico de los datos asociados a las aristas, que deben ser ponderados (tener peso).
      */
     @Override
     public <V, D extends WeightedEdge> double obtenerExcentricidad(IDirectedIGraph<V, D> grafo, Comparable<V> vertexCriteria) {
         V vertice = grafo.buscarVertice(vertexCriteria);
-        if(vertice == null){
+        if (vertice == null) {
             return Double.POSITIVE_INFINITY;
         }
         IFloydWarshallResult<V> resultadoFloyd = floyd(grafo);
         double excentricidad = 0;
-        for(V otroVertice : grafo.vertices()){
+        for (V otroVertice : grafo.vertices()) {
             double distancia = resultadoFloyd.getCost(vertice, otroVertice);
             excentricidad = Math.max(excentricidad, distancia);
 
@@ -237,7 +241,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * @param target criterio para encontrar el vértice de destino
      * @param grafo  grafo sobre el que se buscan los caminos
      * @return lista de todos los caminos simples encontrados, cada uno con su costo total;
-     *         lista vacía si alguno de los vértices no existe o no hay caminos
+     * lista vacía si alguno de los vértices no existe o no hay caminos
      */
     @Override
     public <V, D extends WeightedEdge> List<Path<V>> obtenerTodosLosCaminos(Comparable<V> source, Comparable<V> target, IGraph<V, D> grafo) {
@@ -312,6 +316,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * Metodo recursivo auxiliar del recorrido en profundidad.
      * Si el vértice ya fue visitado retorna inmediatamente.
      * Si no, lo marca como visitado, aplica el consumer y recurre sobre sus adyacentes.
+     *
      * @param grafo         grafo a recorrer
      * @param verticeActual vértice que se está procesando en esta llamada
      * @param consumer      función que se ejecuta al visitar cada vértice
@@ -330,6 +335,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * Recorrido en amplitud del grafo comenzando desde el vértice que cumple con el criterio.
      * Orden: O(Vertices^2 + Aristas), porque adyacencias() resuelve el vértice con buscarVertice()
      * en O(Vertices) y se invoca una vez por cada vértice desencolado.
+     *
      * @param grafo          grafo a recorrer
      * @param sourceCriteria criterio para encontrar el vértice de origen del recorrido
      * @param consumer       función que se ejecuta al visitar cada vértice
@@ -356,84 +362,55 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
 
     }
 
-<<<<<<< HEAD
-    public <V, D> void clasificacionTopologicaAuxPPT(V nodo,Set<V> visitados,LinkedList<V> listaNodos,IDirectedIGraph<V, D> grafo){
-        if (!visitados.contains(nodo)){
+    /**
+     * Metodo recursivo auxiliar para calcular la clasificación topológica del grafo.
+     * Si el nodo ya fue visitado retorna inmediatamente. Si no, lo marca como visitado,
+     * recurre sobre todos sus adyacentes, y al volver (cuando ya se procesaron todos sus
+     * descendientes) lo agrega al inicio de la lista. Esto garantiza que cada vértice quede
+     * por delante de todos los vértices a los que apunta.
+     * Orden: el algoritmo de clasificación topológica es O(Vertices + Aristas), visitando cada
+     * vértice y arista alcanzable una sola vez. En esta implementación el orden efectivo es
+     * O(Vertices^2 + Aristas), porque adyacencias() resuelve el vértice con buscarVertice() en
+     * O(Vertices) y se invoca una vez por cada vértice.
+     *
+     * @param nodo       vértice que se está procesando en esta llamada
+     * @param visitados  conjunto compartido de vértices ya procesados, consultado en O(1)
+     * @param listaNodos lista compartida donde se acumula el resultado, agregando al inicio
+     * @param grafo      grafo dirigido sobre el que se ejecuta el recorrido en profundidad
+     * @param <V>        tipo genérico de los vértices del grafo
+     * @param <D>        tipo genérico de los datos asociados a las aristas
+     */
+    public <V, D> void clasificacionTopologicaAuxPPT(V nodo, Set<V> visitados, LinkedList<V> listaNodos, IDirectedIGraph<V, D> grafo) {
+        if (!visitados.contains(nodo)) {
             visitados.add(nodo);
-            List<Edge<V, D>> aristas = grafo.adyacencias((Comparable<V>) nodo);
+            List<Edge<V, D>> aristas = grafo.adyacencias(grafo.construirComparable(nodo));
 
-            for(Edge<V, D> w : aristas){
+            for (Edge<V, D> w : aristas) {
                 V adyacente = w.target();
-                clasificacionTopologicaAuxPPT(adyacente,visitados,listaNodos,grafo);
+                clasificacionTopologicaAuxPPT(adyacente, visitados, listaNodos, grafo);
             }
             listaNodos.addFirst(nodo);
         }
     }
 
+    /**
+     * Calcula una clasificación topológica del grafo dirigido recorriéndolo en profundidad
+     * y agregando cada vértice al inicio de la lista al terminar sus descendientes.
+     * Recorre todos los vértices para cubrir grafos no conexos o con varias raíces.
+     * Precondición: el grafo debe ser acíclico; con ciclos el orden devuelto no es válido.
+     *
+     * @param grafo grafo dirigido a clasificar
+     * @return lista de vértices en orden topológico
+     */
     @Override
     public <V, D> List<V> calcularClasificacionTopologica(IDirectedIGraph<V, D> grafo) {
         Set<V> visitados = new HashSet<>();
         LinkedList<V> listaNodos = new LinkedList<>();
 
-        for(V vertices : grafo.vertices()){
-            clasificacionTopologicaAuxPPT(vertices,visitados,listaNodos,grafo);
+        for (V vertices : grafo.vertices()) {
+            clasificacionTopologicaAuxPPT(vertices, visitados, listaNodos, grafo);
         }
-
         return listaNodos;
-=======
-    /**
-     * Clasificación topológica del grafo mediante DFS con stack de finalización.
-     * Recorre todos los vértices; por cada uno no visitado lanza un DFS que apila
-     * cada vértice al terminar de explorar todos sus descendientes. El orden topológico
-     * es el inverso del orden de apilado.
-     * Solo es válido para DAGs (grafos dirigidos sin ciclos).
-     * Orden: O(V + A), igual que un DFS estándar.
-     *
-     * @param grafo grafo dirigido acíclico sobre el que se calcula el orden topológico
-     * @return lista de vértices en orden topológico; si el grafo tiene ciclos el resultado
-     *         no tiene validez semántica
-     */
-    @Override
-    public <V, D> List<V> calcularClasificacionTopologica(IDirectedIGraph<V, D> grafo) {
-        Set<V> visitados = new HashSet<>();
-        Deque<V> stack = new ArrayDeque<>();
-
-        for (V vertice : grafo.vertices()) {
-            if (!visitados.contains(vertice)) {
-                topoRecursivo(grafo, vertice, visitados, stack);
-            }
-        }
-
-        List<V> resultado = new ArrayList<>();
-        while (!stack.isEmpty()) {
-            resultado.add(stack.pop());
-        }
-        return resultado;
-    }
-
-    /**
-     * Método recursivo auxiliar para calcularClasificacionTopologica.
-     * Marca el vértice actual como visitado, recurre sobre cada vecino no visitado,
-     * y al finalizar todos sus descendientes lo apila. Esto garantiza que un vértice
-     * siempre quede por delante de todos los vértices a los que apunta.
-     *
-     * @param grafo     grafo dirigido sobre el que se ejecuta el DFS
-     * @param actual    vértice que se está procesando en esta llamada
-     * @param visitados conjunto compartido de vértices ya procesados
-     * @param stack     pila compartida donde se apilan los vértices al finalizar
-     */
-    private <V, D> void topoRecursivo(
-            IDirectedIGraph<V, D> grafo, V actual,
-            Set<V> visitados, Deque<V> stack) {
-
-        visitados.add(actual);
-        for (Edge<V, D> arista : grafo.adyacencias(grafo.construirComparable(actual))) {
-            V vecino = arista.target();
-            if (!visitados.contains(vecino)) {
-                topoRecursivo(grafo, vecino, visitados, stack);
-            }
-        }
-        stack.push(actual);
->>>>>>> bbc448063b5e88006a39f0349ed3d46f17070a57
     }
 }
+
