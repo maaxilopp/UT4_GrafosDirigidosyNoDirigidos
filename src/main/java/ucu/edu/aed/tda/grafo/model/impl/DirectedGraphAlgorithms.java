@@ -179,7 +179,8 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * @param grafo grafo al que se le calcula el centro.
      * @param <V>   genérico de los vértices del grafo.
      * @param <D>   genérico de los datos asociados a las aristas, que deben ser ponderados.
-     * @return el vértice de menor excentricidad, o null si el grafo está vacío.
+     * @return el vértice de menor excentricidad, o null si el grafo está vacío o si ningún vertice
+     * alcanza a todos los demas.
      */
     @Override
     public <V, D extends WeightedEdge> V obtenerCentroGrafo(IDirectedIGraph<V, D> grafo) {
@@ -333,8 +334,8 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
 
     /**
      * Recorrido en amplitud del grafo comenzando desde el vértice que cumple con el criterio.
-     * Orden: O(Vertices^2 + Aristas), porque adyacencias() resuelve el vértice con buscarVertice()
-     * en O(Vertices) y se invoca una vez por cada vértice desencolado.
+     * Orden: O(Vertices + Aristas), pasa por todos los vertices y aristas del grafo
+     * (alcanzables) una vez exactamente.
      *
      * @param grafo          grafo a recorrer
      * @param sourceCriteria criterio para encontrar el vértice de origen del recorrido
@@ -370,9 +371,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * por delante de todos los vértices a los que apunta.
      * Orden: el algoritmo de clasificación topológica es O(Vertices + Aristas), visitando cada
      * vértice y arista alcanzable una sola vez. En esta implementación el orden efectivo es
-     * O(Vertices^2 + Aristas), porque adyacencias() resuelve el vértice con buscarVertice() en
-     * O(Vertices) y se invoca una vez por cada vértice.
-     *
+     * Orden: O(Vertices + Aristas), visitando cada vértice y arista alcanzable una sola vez.
      * @param nodo       vértice que se está procesando en esta llamada
      * @param visitados  conjunto compartido de vértices ya procesados, consultado en O(1)
      * @param listaNodos lista compartida donde se acumula el resultado, agregando al inicio
