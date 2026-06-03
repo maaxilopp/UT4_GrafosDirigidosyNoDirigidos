@@ -369,8 +369,6 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * recurre sobre todos sus adyacentes, y al volver (cuando ya se procesaron todos sus
      * descendientes) lo agrega al inicio de la lista. Esto garantiza que cada vértice quede
      * por delante de todos los vértices a los que apunta.
-     * Orden: el algoritmo de clasificación topológica es O(Vertices + Aristas), visitando cada
-     * vértice y arista alcanzable una sola vez. En esta implementación el orden efectivo es
      * Orden: O(Vertices + Aristas), visitando cada vértice y arista alcanzable una sola vez.
      * @param nodo       vértice que se está procesando en esta llamada
      * @param visitados  conjunto compartido de vértices ya procesados, consultado en O(1)
