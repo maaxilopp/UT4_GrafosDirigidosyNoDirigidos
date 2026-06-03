@@ -226,10 +226,71 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         return excentricidad;
     }
 
+    /**
+     * Encuentra todos los caminos simples (sin ciclos) desde el vértice origen al destino.
+     * Usa backtracking DFS: explora cada vecino no visitado, lo agrega al camino actual,
+     * recurre, y al volver deshace la decisión para explorar otras ramas.
+     * Orden: O(V!) en el peor caso, ya que puede haber un camino simple por cada
+     * permutación de vértices. Solo es práctico en grafos pequeños o dispersos.
+     *
+     * @param source criterio para encontrar el vértice de origen
+     * @param target criterio para encontrar el vértice de destino
+     * @param grafo  grafo sobre el que se buscan los caminos
+     * @return lista de todos los caminos simples encontrados, cada uno con su costo total;
+     *         lista vacía si alguno de los vértices no existe o no hay caminos
+     */
     @Override
     public <V, D extends WeightedEdge> List<Path<V>> obtenerTodosLosCaminos(Comparable<V> source, Comparable<V> target, IGraph<V, D> grafo) {
-        return List.of();
+        V origen = grafo.buscarVertice(source);
+        V destino = grafo.buscarVertice(target);
+        if (origen == null || destino == null) return List.of();
+
+        List<Path<V>> resultados = new ArrayList<>();
+        Set<V> visitados = new HashSet<>();
+        List<V> caminoActual = new ArrayList<>();
+
+        caminoActual.add(origen);
+        visitados.add(origen);
+        buscarCaminosRecursivo(grafo, origen, destino, visitados, caminoActual, 0.0, resultados);
+        return resultados;
     }
+
+    /**
+     * Método recursivo auxiliar para obtenerTodosLosCaminos.
+     * Al llegar al destino guarda una copia del camino actual junto a su costo acumulado.
+     * Para cada vecino no visitado: lo marca, lo agrega al camino y recurre;
+     * al retornar lo desmarca y lo elimina del camino (backtrack).
+     *
+     * @param grafo          grafo sobre el que se buscan los caminos
+     * @param actual         vértice que se está procesando en esta llamada
+     * @param destino        vértice al que se quiere llegar
+     * @param visitados      conjunto de vértices ya en el camino actual, evita ciclos
+     * @param caminoActual   lista con los vértices del camino construido hasta ahora
+     * @param costoAcumulado suma de los pesos de las aristas recorridas hasta ahora
+     * @param resultados     lista compartida donde se agregan los caminos completos encontrados
+     */
+    private <V, D extends WeightedEdge> void buscarCaminosRecursivo(
+            IGraph<V, D> grafo, V actual, V destino,
+            Set<V> visitados, List<V> caminoActual, double costoAcumulado, List<Path<V>> resultados) {
+
+        if (actual.equals(destino)) {
+            resultados.add(new Path<>(new ArrayList<>(caminoActual), costoAcumulado));
+            return;
+        }
+        for (Edge<V, D> arista : grafo.adyacencias(grafo.construirComparable(actual))) {
+            V vecino = arista.target();
+            if (!visitados.contains(vecino)) {
+                visitados.add(vecino);
+                caminoActual.add(vecino);
+                buscarCaminosRecursivo(grafo, vecino, destino, visitados, caminoActual,
+                        costoAcumulado + arista.dato().getWeight(), resultados);
+                // backtrack
+                caminoActual.remove(caminoActual.size() - 1);
+                visitados.remove(vecino);
+            }
+        }
+    }
+
 
     /**
      * Recorrido en profundidad del grafo comenzando desde el vértice que cumple con el criterio.
@@ -295,8 +356,58 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
 
     }
 
+    /**
+     * Clasificación topológica del grafo mediante DFS con stack de finalización.
+     * Recorre todos los vértices; por cada uno no visitado lanza un DFS que apila
+     * cada vértice al terminar de explorar todos sus descendientes. El orden topológico
+     * es el inverso del orden de apilado.
+     * Solo es válido para DAGs (grafos dirigidos sin ciclos).
+     * Orden: O(V + A), igual que un DFS estándar.
+     *
+     * @param grafo grafo dirigido acíclico sobre el que se calcula el orden topológico
+     * @return lista de vértices en orden topológico; si el grafo tiene ciclos el resultado
+     *         no tiene validez semántica
+     */
     @Override
     public <V, D> List<V> calcularClasificacionTopologica(IDirectedIGraph<V, D> grafo) {
-        return List.of();
+        Set<V> visitados = new HashSet<>();
+        Deque<V> stack = new ArrayDeque<>();
+
+        for (V vertice : grafo.vertices()) {
+            if (!visitados.contains(vertice)) {
+                topoRecursivo(grafo, vertice, visitados, stack);
+            }
+        }
+
+        List<V> resultado = new ArrayList<>();
+        while (!stack.isEmpty()) {
+            resultado.add(stack.pop());
+        }
+        return resultado;
+    }
+
+    /**
+     * Método recursivo auxiliar para calcularClasificacionTopologica.
+     * Marca el vértice actual como visitado, recurre sobre cada vecino no visitado,
+     * y al finalizar todos sus descendientes lo apila. Esto garantiza que un vértice
+     * siempre quede por delante de todos los vértices a los que apunta.
+     *
+     * @param grafo     grafo dirigido sobre el que se ejecuta el DFS
+     * @param actual    vértice que se está procesando en esta llamada
+     * @param visitados conjunto compartido de vértices ya procesados
+     * @param stack     pila compartida donde se apilan los vértices al finalizar
+     */
+    private <V, D> void topoRecursivo(
+            IDirectedIGraph<V, D> grafo, V actual,
+            Set<V> visitados, Deque<V> stack) {
+
+        visitados.add(actual);
+        for (Edge<V, D> arista : grafo.adyacencias(grafo.construirComparable(actual))) {
+            V vecino = arista.target();
+            if (!visitados.contains(vecino)) {
+                topoRecursivo(grafo, vecino, visitados, stack);
+            }
+        }
+        stack.push(actual);
     }
 }
