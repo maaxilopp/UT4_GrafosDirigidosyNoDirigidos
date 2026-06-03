@@ -232,9 +232,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
     }
 
     /**
-     * Recorrido en profundidad del grafo comenzando desde el vértice que cumple sourceCriteria.
-     * Si el grafo no es conexo, continúa el recorrido desde los vértices no alcanzados,
-     * garantizando que todos los vértices sean visitados exactamente una vez.
+     * Recorrido en profundidad del grafo comenzando desde el vértice que cumple con el criterio.
      * Orden: O(Vertices + Aristas), pasa por todos los vertices y aristas del grafo una vez exactamente.
      *
      * @param grafo          grafo a recorrer
@@ -247,9 +245,6 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         if (verticeInicial == null) return;
         Set<V> visitados = new HashSet<>();
         recorridoEnProfundidadRecursivo(grafo, verticeInicial, consumer, visitados);
-        for (V vertice : grafo.vertices()) {
-            recorridoEnProfundidadRecursivo(grafo, vertice, consumer, visitados);
-        }
     }
 
     /**
