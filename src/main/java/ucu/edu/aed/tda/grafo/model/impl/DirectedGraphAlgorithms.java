@@ -295,8 +295,28 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
 
     }
 
+    public <V, D> void clasificacionTopologicaAux(V nodo,Set<V> visitados,LinkedList<V> listaNodos,IDirectedIGraph<V, D> grafo){
+        if (!visitados.contains(nodo)){
+            visitados.add(nodo);
+            List<Edge<V, D>> aristas = grafo.adyacencias((Comparable<V>) nodo);
+
+            for(Edge<V, D> w : aristas){
+                V adyacente = w.target();
+                clasificacionTopologicaAux(adyacente,visitados,listaNodos,grafo);
+            }
+            listaNodos.addFirst(nodo);
+        }
+    }
+
     @Override
     public <V, D> List<V> calcularClasificacionTopologica(IDirectedIGraph<V, D> grafo) {
-        return List.of();
+        Set<V> visitados = new HashSet<>();
+        LinkedList<V> listaNodos = new LinkedList<>();
+
+        for(V vertices : grafo.vertices()){
+            clasificacionTopologicaAux(vertices,visitados,listaNodos,grafo);
+        }
+
+        return listaNodos;
     }
 }
