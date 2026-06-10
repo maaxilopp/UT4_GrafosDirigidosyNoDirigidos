@@ -10,25 +10,64 @@ import java.util.function.Consumer;
 
 public class UndirectedGraphAlgorithms implements IUndirectedGraphAlgorithm {
 
+    /**
+     * Algoritmo de Kruskal para hallar un Árbol Abarcador de costo Mínimo.
+     * Parte de M con los vértices de G y sin aristas, y de la lista A con todas las
+     * aristas de G. En cada iteración elige la arista de costo mínimo de A, la quita
+     * de A y la agrega a M; si al agregarla M queda con un ciclo la remueve, y si no,
+     * cuenta esa arista como parte del árbol. Repite hasta haber agregado V-1 aristas.
+     * Orden: O(V x A x (V + A)) en el peor caso, por la búsqueda de la mínima y la
+     * detección de ciclos en cada una de las iteraciones.
+     *
+     * @param graph grafo no dirigido y ponderado de entrada
+     * @param <V>   tipo genérico de los vértices
+     * @param <D>   tipo del dato de la arista, debe ser ponderado (tener peso)
+     * @return un nuevo grafo con los vértices de graph y las aristas del AAM
+     */
     @Override
+    @SuppressWarnings("unchecked")
     public <V, D extends WeightedEdge> IUndirectedGraph<V, D> kruskal(IUndirectedGraph<V, D> graph) {
-        UndirectedGraph<V, D> arbol = new UndirectedGraph<>();
-        graph.vertices().forEach(arbol::agregarVertice);
-        List<Edge<V, D>> aristasOrdenadas = new ArrayList<>();
-        graph.aristas().forEach(e -> aristasOrdenadas.add((Edge<V, D>) e));
-        aristasOrdenadas.sort(Comparator.comparingDouble(e -> e.dato().getWeight()));
+        List<Edge<V, D>> a = new ArrayList<>();
+        graph.aristas().forEach(e -> a.add((Edge<V, D>) e));
 
-        UnionFind<V> componentes = new UnionFind<>(graph.vertices());
+        UndirectedGraph<V, D> m = new UndirectedGraph<>();
+        graph.vertices().forEach(m::agregarVertice);
 
-        for (Edge<V, D> arista : aristasOrdenadas) {
-            V u = arista.source();
-            V v = arista.target();
-            if (componentes.find(u) != componentes.find(v)) {
-                componentes.union(u, v);
-                arbol.agregarArista(u, v, arista.dato());
+        int n = graph.cantidadDeVertices() - 1;
+        int i = 0;
+
+        while (i < n) {
+            Edge<V, D> arista = elegirAristaMinima(a);
+            a.remove(arista);
+            m.agregarArista(arista.source(), arista.target(), arista.dato());
+            if (m.tieneCiclos()) {
+                m.eliminarArista(m.construirComparable(arista.source()), m.construirComparable(arista.target()));
+            } else {
+                i++;
             }
         }
-        return arbol;
+        return m;
+    }
+
+    /**
+     * Retorna la arista de menor costo de la lista dada.
+     * Orden: O(A), recorre todas las aristas una vez.
+     *
+     * @param aristas lista de aristas candidatas
+     * @param <V>     tipo genérico de los vértices
+     * @param <D>     tipo del dato de la arista, debe ser ponderado (tener peso)
+     * @return la arista de costo mínimo, o null si la lista está vacía
+     */
+    private <V, D extends WeightedEdge> Edge<V, D> elegirAristaMinima(List<Edge<V, D>> aristas) {
+        Edge<V, D> minima = null;
+        double min = Double.MAX_VALUE;
+        for (Edge<V, D> arista : aristas) {
+            if (arista.dato().getWeight() < min) {
+                min = arista.dato().getWeight();
+                minima = arista;
+            }
+        }
+        return minima;
     }
 
     /**
@@ -136,40 +175,6 @@ public class UndirectedGraphAlgorithms implements IUndirectedGraphAlgorithm {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Permite, en tiempo casi constante, saber si dos vértices están en el mismo
-     * componente conexo y unir dos componentes. La usa Kruskal para descartar las
-     * aristas que cerrarían un ciclo.
-     *
-     * @param <T> tipo de los elementos (vértices)
-     */
-    private static final class UnionFind<T> {
-        private final Map<T, T> padre = new HashMap<>();
-
-        UnionFind(Collection<T> elementos) {
-            elementos.forEach(e -> padre.put(e, e));
-        }
-
-
-        T find(T x) {
-            T raiz = x;
-            while (!raiz.equals(padre.get(raiz))) {
-                raiz = padre.get(raiz);
-            }
-            T actual = x;
-            while (!actual.equals(raiz)) {
-                T siguiente = padre.get(actual);
-                padre.put(actual, raiz);
-                actual = siguiente;
-            }
-            return raiz;
-        }
-
-        void union(T x, T y) {
-            padre.put(find(x), find(y));
         }
     }
 }
